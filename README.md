@@ -27,3 +27,7 @@ Three workflows are included:
 - The `release` workflow runs when a new GitHub Release is pushed. It builds the container image and pushes the result to GHCR under the `latest` tag, and semver-hierarchical version tags.
 
 The `build` and `release` workflows can also be triggered manually, in case a previous release needs to be build again to catch up with OS-level updates.
+
+## Linting
+
+The template contains a very basic `.editorconfig`, and a config file for [`pre-commit`](https://pre-commit.com/) that runs Clippy and Rustfmt in a `pre-commit` hook. Be sure to run `pre-commit install` in new clones to set up the git hook.
