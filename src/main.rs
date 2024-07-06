@@ -32,24 +32,24 @@ async fn shutdown_signal() {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let settings = Settings::parse();
+    let settings_clone = settings.clone();
+
     let subscriber = tracing_subscriber::fmt()
-        .with_max_level(settings.log_level.tracing_level())
+        .with_max_level(settings_clone.log_level.tracing_level())
         .with_target(false);
-    match settings.log_format {
+    match settings_clone.log_format {
         LogFormat::Text => subscriber.with_ansi(false).init(),
         LogFormat::TextColor => subscriber.with_ansi(true).init(),
         LogFormat::Json => subscriber.json().with_span_list(false).init(),
     }
 
-    let router = build_main_router(AppState {
-        settings: settings.clone(),
-    });
+    let router = build_main_router(AppState { settings });
 
-    let listener = TcpListener::bind(settings.listen)
+    let listener = TcpListener::bind(settings_clone.listen)
         .await
-        .context(format!("could not listen to `{}`", settings.listen))?;
+        .context(format!("could not listen to `{}`", settings_clone.listen))?;
 
-    info!("starting server on `{}`", settings.listen);
+    info!("starting server on `{}`", settings_clone.listen);
     axum::serve(listener, router.into_make_service())
         .with_graceful_shutdown(shutdown_signal())
         .await
